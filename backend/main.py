@@ -37,6 +37,11 @@ from api_service import ExternalAPIError, external_api_service
 from model_runtime import ModelRuntimeError, load_model_runtimes
 
 from models.oil_spill_adapter import oil_spill_model_adapter
+from models.oil_spill_model import oil_spill_model
+from services.analysis_service import analysis_service
+from services.supabase_service import supabase_service
+from services.storage_service import storage_service
+
 from services.evidence_service import evidence_service
 from services.weather_service import weather_service
 from services.ocean_current_service import ocean_current_service
@@ -199,35 +204,75 @@ def api_health():
 # 1. CORE PIPELINE: MANUAL ANALYSIS ENDPOINT
 # =====================================================
 
+
+# =====================================================
+# ATTENTION U-NET MODEL STATUS & SUPABASE INTEGRATION
+# =====================================================
+
+@app.get("/api/model/status")
+def get_attention_unet_status():
+    """Returns actual Attention U-Net model status and execution device."""
+    return oil_spill_model.get_status()
+
+
+@app.get("/api/kpi")
+def get_dynamic_kpi_statistics():
+    """Returns dynamic KPI statistics queried directly from Supabase."""
+    return supabase_service.get_kpi_statistics()
+
+
+@app.get("/api/history")
+def get_analysis_history(limit: int = Query(50, ge=1, le=200)):
+    """Returns previous analysis records from Supabase."""
+    return {"analyses": supabase_service.get_history(limit=limit)}
+
+
+@app.get("/api/history/{analysis_id}")
+def get_analysis_by_id(analysis_id: str):
+    """Retrieves a single historical analysis record from Supabase."""
+    record = supabase_service.get_analysis_by_id(analysis_id)
+    if not record:
+        raise HTTPException(status_code=404, detail="Analysis record not found.")
+    return record
+
+
+@app.get("/api/auth/profile")
+def get_operator_profile():
+    """Returns active operator profile from Supabase."""
+    return supabase_service.get_or_create_user()
+
+
+# =====================================================
+# CORE PIPELINE: REAL ATTENTION U-NET ANALYSIS ENDPOINTS
+# =====================================================
+
+@app.post("/api/analyze")
 @app.post("/api/analyze/manual")
-async def analyze_manual(
+async def analyze_sar_scene(
     file: Optional[UploadFile] = File(None),
+    image: Optional[UploadFile] = File(None),
     image_url: Optional[str] = Form(None),
     base_lat: Optional[float] = Form(None),
     base_lon: Optional[float] = Form(None),
-    operator_id: Optional[str] = Form("OPERATOR-01"),
+    operator_name: Optional[str] = Form("Durga C"),
+    operator_email: Optional[str] = Form("durga@spillwatch.maritime.gov"),
     db: Session = Depends(get_db)
 ):
     """
-    Executes the complete manual pipeline:
-    SATELLITE IMAGE -> IMAGE VALIDATION -> PREPROCESSING -> RESNET-18 CLASSIFICATION ->
-    ATTENTION SEGMENTATION MASK -> CONFIDENCE & AREA -> GEOSPATIAL EXTRACTION ->
-    AIS VESSEL DATA -> KINEMATIC ATTRIBUTION CORRELATION -> REAL-TIME WIND + CURRENT ->
-    2-HOUR LAGRANGIAN DRIFT PREDICTION -> MAP VECTORS -> SHA-256 HASH & REPORT.
+    Executes the real Attention U-Net segmentation pipeline:
+    SAR Image -> Preprocessing -> Attention U-Net -> Pixel Probability Map ->
+    Threshold -> Binary Mask (0/1) -> Physical Area km2 -> Bounding Box ->
+    Semi-transparent Red Overlay -> Supabase Storage & Database Persistence.
     """
-    analysis_id = f"SW-MAN-{datetime.datetime.utcnow().strftime('%Y%m%d')}-{uuid.uuid4().hex[:6].upper()}"
-
-    # Read image contents
-    if file:
-        contents = await file.read()
-        filename = file.filename or "uploaded_satellite_scene.jpg"
+    upload_file = file or image
+    if upload_file:
+        contents = await upload_file.read()
+        filename = upload_file.filename or "uploaded_sar_scene.png"
     elif image_url:
         filename = os.path.basename(image_url)
-        # Check if local file
         local_path = Path(BASE_DIR) / image_url.lstrip("/")
         if local_path.exists():
-            with open(local_path, "rb") as f:
-                contents = f.read()
+            contents = local_path.read_bytes()
         else:
             try:
                 res = requests.get(image_url, timeout=5)
@@ -235,189 +280,44 @@ async def analyze_manual(
             except Exception:
                 raise HTTPException(status_code=400, detail="Could not retrieve image from provided URL.")
     else:
-        # Fallback to sample slick image
         sample_path = ROOT_DIR / "binary classification-20260916T134200Z-1-001" / "binary classification" / "model_service_handoff" / "sample_images" / "oil_sample_1.jpg"
         if sample_path.exists():
-            with open(sample_path, "rb") as f:
-                contents = f.read()
+            contents = sample_path.read_bytes()
             filename = "oil_sample_1.jpg"
         else:
             raise HTTPException(status_code=400, detail="No satellite image file provided for analysis.")
 
     _ensure_valid_image_bytes(filename, None, contents, max_mb=25)
 
-    # 1. Forensic Evidence SHA-256 Hashing & Storage
-    evidence = evidence_service.store_evidence(contents, filename, operator_id=operator_id)
-    audit_service.log("image_upload", analysis_id=analysis_id, operator=operator_id, details={"filename": filename, "sha256": evidence["sha256_hash"]}, db_session=db)
-
-    # 2. Model Inference (Classification + Segmentation)
-    audit_service.log("model_inference", analysis_id=analysis_id, operator=operator_id, details={"model": oil_spill_model_adapter.model_name}, db_session=db)
-    model_output = oil_spill_model_adapter.predict_full_pipeline(contents, base_lat=base_lat, base_lon=base_lon)
-
-    cls_res = model_output["classification"]
-    seg_res = model_output["segmentation"]
-    geo_res = model_output["geospatial"]
-    spill_lat = geo_res["latitude"]
-    spill_lon = geo_res["longitude"]
-
-    # 3. Save Segmentation Mask & Overlay PNG files
-    saved_urls = evidence_service.save_mask_and_overlay(analysis_id, seg_res["mask_array"], seg_res["overlay_array"])
-    seg_res["mask_url"] = saved_urls["mask_url"]
-    seg_res["overlay_url"] = saved_urls["overlay_url"]
-
-    # 4. MetOcean Weather & Ocean Current Live Queries
-    weather_res = weather_service.get_weather(spill_lat, spill_lon)
-    ocean_res = ocean_current_service.get_ocean_current(spill_lat, spill_lon)
-
-    # 5. Physics-based Lagrangian 2-Hour Drift Prediction
-    drift_res = drift_service.calculate_drift(
-        lat=spill_lat,
-        lon=spill_lon,
-        current_speed_kn=ocean_res["current_speed_kn"],
-        current_dir_deg=ocean_res["current_direction_deg"],
-        wind_speed_kn=weather_res["wind_speed_kn"],
-        wind_dir_deg=weather_res["wind_direction_deg"],
-        initial_area_km2=seg_res["spill_area_km2"] if cls_res["oil_detected"] else 0.0,
-        hours=2
-    )
-
-    # 6. AIS Vessel Retrieval & Kinematic Attribution Correlation
-    ais_raw = ais_service.get_vessels(spill_lat, spill_lon, radius_km=50.0)
-    correlated_vessels = correlation_service.correlate_vessels(spill_lat, spill_lon, ais_raw["vessels"], spill_area_km2=seg_res["spill_area_km2"])
-
-    # 7. Generate Forensic Report
-    full_analysis_data = {
-        "analysis_id": analysis_id,
-        "mode": "manual",
-        "evidence": evidence,
-        "classification": cls_res,
-        "segmentation": {
-            "spill_area_km2": seg_res["spill_area_km2"],
-            "pixel_coverage_pct": seg_res["pixel_coverage_pct"],
-            "bounding_box": seg_res["bounding_box"],
-            "geojson_polygon": seg_res["geojson_polygon"],
-            "mask_url": seg_res["mask_url"],
-            "overlay_url": seg_res["overlay_url"],
-            "severity": seg_res["severity"],
-            "reason": seg_res["reason"]
-        },
-        "geospatial": geo_res,
-        "weather": weather_res,
-        "ocean_current": ocean_res,
-        "drift": drift_res,
-        "vessels": correlated_vessels,
-        "model_metadata": model_output["model_metadata"]
-    }
-
-    report_meta = report_service.generate_report(full_analysis_data)
-    full_analysis_data["report"] = report_meta
-
-    # 8. Persist into Database
     try:
-        db_record = AnalysisRecord(
-            analysis_id=analysis_id,
-            mode="manual",
-            status="completed",
-            sha256_hash=evidence["sha256_hash"],
-            oil_detected=cls_res["oil_detected"],
-            confidence=cls_res["confidence"],
-            spill_area_km2=seg_res["spill_area_km2"],
-            latitude=spill_lat,
-            longitude=spill_lon,
-            model_name=model_output["model_metadata"]["model_name"],
-            model_version=model_output["model_metadata"]["model_version"],
-            model_hash=model_output["model_metadata"]["model_hash"],
-            processing_time_seconds=model_output["model_metadata"]["processing_time_seconds"],
-            raw_results_json=json.dumps({k: v for k, v in full_analysis_data.items() if k != "evidence"}),
-            report_url=report_meta["report_url"],
-            operator_id=operator_id
+        result = analysis_service.analyze_scene(
+            image_bytes=contents,
+            filename=filename,
+            operator_name=operator_name or "Durga C",
+            operator_email=operator_email or "durga@spillwatch.maritime.gov",
+            base_lat=base_lat,
+            base_lon=base_lon
         )
-        db.add(db_record)
-
-        db_img = UploadedImage(
-            file_id=evidence["file_id"],
-            original_filename=filename,
-            sha256_hash=evidence["sha256_hash"],
-            file_size_bytes=evidence["file_size_bytes"],
-            evidence_url=evidence["evidence_url"],
-            processed_url=evidence["processed_url"],
-            has_geospatial=geo_res["has_geospatial_metadata"],
-            latitude=spill_lat,
-            longitude=spill_lon,
-            operator_id=operator_id
-        )
-        db.add(db_img)
-
-        db_seg = SegmentationResult(
-            analysis_id=analysis_id,
-            mask_url=seg_res["mask_url"],
-            overlay_url=seg_res["overlay_url"],
-            spill_area_km2=seg_res["spill_area_km2"],
-            pixel_coverage_pct=seg_res["pixel_coverage_pct"],
-            bounding_box_json=json.dumps(seg_res["bounding_box"]),
-            geojson_polygon=json.dumps(seg_res["geojson_polygon"])
-        )
-        db.add(db_seg)
-
-        # Also create OilSpill record for global dashboard mapping
-        if cls_res["oil_detected"]:
-            global_spill = OilSpill(
-                spill_id=analysis_id,
-                lat=spill_lat,
-                lon=spill_lon,
-                area_km2=seg_res["spill_area_km2"],
-                confidence=round(cls_res["confidence"] * 100, 1),
-                severity=seg_res["severity"],
-                drift_direction=drift_res["drift_cardinal"],
-                drift_speed_kn=drift_res["drift_velocity_kn"],
-                model_name=model_output["model_metadata"]["model_name"],
-                polygon_json=json.dumps(seg_res["geojson_polygon"]),
-                bounding_box_json=json.dumps(seg_res["bounding_box"]),
-                image_url=evidence["evidence_url"],
-                mask_url=seg_res["mask_url"],
-                is_real_data=True,
-                data_label="REAL DATA",
-                weather_info_json=json.dumps(weather_res),
-                prediction_json=json.dumps(drift_res)
-            )
-            db.add(global_spill)
-
-        db.commit()
+        return result
     except Exception as e:
-        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Attention U-Net analysis failed: {e}")
 
-    audit_service.log("result_generated", analysis_id=analysis_id, operator=operator_id, details={"oil_detected": cls_res["oil_detected"], "area": seg_res["spill_area_km2"]}, db_session=db)
-
-    return full_analysis_data
-
-
-# =====================================================
-# 2. CORE PIPELINE: AUTOMATIC ANALYSIS ENDPOINT
-# =====================================================
 
 @app.post("/api/analyze/automatic")
-async def analyze_automatic(
+async def analyze_sar_scene_automatic(
     file: Optional[UploadFile] = File(None),
-    image_url: Optional[str] = Form(None),
-    operator_id: Optional[str] = Form("AUTONOMOUS-PIPELINE"),
+    image: Optional[UploadFile] = File(None),
+    operator_name: Optional[str] = Form("Durga C (Automated)"),
     db: Session = Depends(get_db)
 ):
-    """
-    Executes autonomous 8-stage pipeline from EO scene ingestion to vessel attribution and drift report.
-    """
-    res = await analyze_manual(
-        file=file,
-        image_url=image_url,
-        operator_id=operator_id,
+    """Automatic Sentinel-1 SAR acquisition pipeline endpoint."""
+    return await analyze_sar_scene(
+        file=file or image,
+        operator_name=operator_name,
         db=db
     )
-    res["mode"] = "automatic"
-    return res
 
 
-# =====================================================
-# 3. MODULAR ATOMIC API ENDPOINTS
-# =====================================================
 
 @app.post("/api/upload")
 async def upload_image(

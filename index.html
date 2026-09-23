@@ -2484,7 +2484,8 @@
                         API STATUS UNKNOWN
                     </span>
 
-                    <span class="avatar">OG</span>
+                    <span class="avatar" id="topAvatar">DC</span>
+                    <span id="topOperatorName" style="font-size:12px;font-weight:600;color:var(--text);margin-left:6px;display:inline-block">Operator: Durga C</span>
                 </div>
 
             </header>
@@ -5594,7 +5595,79 @@ Loading official MarineCadastre AccessAIS report from backend...
                 updateSystemStatusUI(true);
                 renderHealthStatus(health);
                 renderDashboardData(data);
-                showToast("Connected to SpillWatch AI services.");
+
+                // 1. Fetch Operator Profile from Supabase
+                try {
+                    const profRes = await fetch(`${API_ROOT}/api/auth/profile`);
+                    if (profRes.ok) {
+                        const prof = await profRes.json();
+                        const nameEl = document.getElementById("topOperatorName");
+                        const avEl = document.getElementById("topAvatar");
+                        if (nameEl && prof.name) nameEl.textContent = `Operator: ${prof.name}`;
+                        if (avEl && prof.name) {
+                            const initials = prof.name.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
+                            avEl.textContent = initials || "OP";
+                        }
+                    }
+                } catch (e) { }
+
+                // 2. Fetch Attention U-Net Model Status
+                try {
+                    const modelRes = await fetch(`${API_ROOT}/api/model/status`);
+                    if (modelRes.ok) {
+                        const mStatus = await modelRes.json();
+                        const binCard = document.getElementById("binaryStatusCard");
+                        const binVal = document.getElementById("binaryStatusValue");
+                        if (binVal) {
+                            binVal.textContent = mStatus.loaded
+                                ? `${mStatus.model_name.toUpperCase()} (READY - ${mStatus.device.toUpperCase()})`
+                                : "ATTENTION U-NET (DATASET REQ)";
+                        }
+                        if (binCard) {
+                            binCard.classList.toggle("ready", mStatus.loaded);
+                            binCard.classList.toggle("error", !mStatus.loaded);
+                        }
+                    }
+                } catch (e) { }
+
+                // 3. Fetch Dynamic KPI from Supabase
+                try {
+                    const kpiRes = await fetch(`${API_ROOT}/api/kpi`);
+                    if (kpiRes.ok) {
+                        const kpi = await kpiRes.json();
+                        rtSetEl("dashTotalScans", kpi.total_analyses);
+                        rtSetEl("dashSpillsDetected", kpi.oil_spills_detected);
+                        rtSetEl("dashCleanScans", kpi.no_oil_spill);
+                        rtSetEl("dashAvgResponse", `${kpi.average_response_seconds}s`);
+                    }
+                } catch (e) { }
+
+                // 4. Fetch Analysis History from Supabase
+                try {
+                    const histRes = await fetch(`${API_ROOT}/api/history`);
+                    if (histRes.ok) {
+                        const histData = await histRes.json();
+                        const records = histData.analyses || [];
+                        if (typeof renderHistoryTable === "function" && records.length > 0) {
+                            const formatted = records.map(r => ({
+                                id: r.analysis_id,
+                                spill_id: r.analysis_id,
+                                detection_date: r.created_at ? r.created_at.substring(0, 16).replace("T", " ") : "Recent",
+                                region_name: r.latitude ? `${Number(r.latitude).toFixed(2)}°N, ${Number(r.longitude).toFixed(2)}°E` : "Maritime Zone",
+                                area_km2: r.spill_area || (r.oil_pixel_count ? `${r.oil_pixel_count} px` : "0.00"),
+                                confidence: Math.round((r.confidence || 0) * 100),
+                                severity: r.classification === "OIL SPILL DETECTED" ? "HIGH" : "CLEAN",
+                                is_real_data: true,
+                                data_label: "REAL DATA (SUPABASE)",
+                                model_name: r.model_name || "Attention U-Net",
+                                top_vessel: (r.vessel_records && r.vessel_records[0]) || { vessel_name: "None", attribution_score: 0 }
+                            }));
+                            renderHistoryTable(formatted);
+                        }
+                    }
+                } catch (e) { }
+
+                showToast("Connected to SpillWatch AI services & Supabase.");
             } catch (err) {
                 console.warn("Backend offline or unreachable, using local fallback state:", err);
                 isBackendOnline = false;
@@ -6351,6 +6424,7 @@ Loading official MarineCadastre AccessAIS report from backend...
                 const result = await res.json();
                 renderAnalysisResult(result);
                 await checkBackendAndLoadAll();
+                finishPipelineProgress();
                 showToast(result.success ? "AI analysis completed successfully." : "Analysis completed.");
             } catch (err) {
                 console.error("Upload error:", err);
@@ -6391,34 +6465,65 @@ Loading official MarineCadastre AccessAIS report from backend...
             }
         }
 
+        let pipelineTimer1 = null;
+        let pipelineTimer2 = null;
+        let pipelineTimer3 = null;
+        let pipelineTimer4 = null;
+
         function animatePipelineProgress() {
             const text = document.getElementById("pipelineStatusText");
             const progress = document.getElementById("pipelineProgressText");
             const fill = document.getElementById("pipelineProgressFill");
-
             if (!text || !fill) return;
 
-            fill.style.width = "0%";
-            text.textContent = "Ingesting SAR Scene...";
+            clearTimeout(pipelineTimer1);
+            clearTimeout(pipelineTimer2);
+            clearTimeout(pipelineTimer3);
+            clearTimeout(pipelineTimer4);
+
+            fill.style.width = "15%";
+            text.textContent = "1. Image Uploaded & SHA-256 Hashed...";
             progress.textContent = "15%";
 
-            setTimeout(() => {
-                fill.style.width = "40%";
-                text.textContent = "Attention U-Net Dark Spot Segmentation...";
-                progress.textContent = "45%";
-            }, 600);
+            pipelineTimer1 = setTimeout(() => {
+                fill.style.width = "35%";
+                text.textContent = "2. Radiometric Pre-processing...";
+                progress.textContent = "35%";
+            }, 400);
 
-            setTimeout(() => {
+            pipelineTimer2 = setTimeout(() => {
+                fill.style.width = "55%";
+                text.textContent = "3. AI Attention U-Net Running...";
+                progress.textContent = "55%";
+            }, 800);
+
+            pipelineTimer3 = setTimeout(() => {
                 fill.style.width = "75%";
-                text.textContent = "Extracting AIS Trajectories & Kinematics...";
+                text.textContent = "4. Segmentation & 5. Classification...";
                 progress.textContent = "75%";
-            }, 1200);
+            }, 1300);
 
-            setTimeout(() => {
-                fill.style.width = "100%";
-                text.textContent = "✓ Attribution & Multi-Factor Ranking Complete";
-                progress.textContent = "100%";
-            }, 1800);
+            pipelineTimer4 = setTimeout(() => {
+                fill.style.width = "88%";
+                text.textContent = "6. Area Calculation & 7. Database Save...";
+                progress.textContent = "88%";
+            }, 1700);
+        }
+
+        function finishPipelineProgress() {
+            clearTimeout(pipelineTimer1);
+            clearTimeout(pipelineTimer2);
+            clearTimeout(pipelineTimer3);
+            clearTimeout(pipelineTimer4);
+
+            const text = document.getElementById("pipelineStatusText");
+            const progress = document.getElementById("pipelineProgressText");
+            const fill = document.getElementById("pipelineProgressFill");
+            if (!text || !fill) return;
+
+            fill.style.width = "100%";
+            text.textContent = "✓ 8. Analysis Complete & Saved to Supabase";
+            progress.textContent = "100%";
         }
 
         // Attach file input listeners
