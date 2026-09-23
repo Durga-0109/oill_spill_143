@@ -2416,10 +2416,9 @@ def v1_get_vessel_by_mmsi(mmsi: str, db: Session = Depends(get_db)):
 def v1_analyze_vessels(payload: Dict[str, Any] = Body(...), db: Session = Depends(get_db)):
     """API Gateway Endpoint: Triggers AIS Correlation & Risk-Scoring Agents."""
     spill_id = payload.get("spill_id")
-    dataset_id = payload.get("dataset_id")
     if not spill_id:
         raise HTTPException(status_code=400, detail="spill_id is required")
-    return analyze_vessel_attribution(spill_id=spill_id, dataset_id=dataset_id, db=db)
+    return run_vessel_attribution(spill_id=spill_id, db=db)
 
 
 @app.get("/api/v1/vessels/{mmsi}/risk")
