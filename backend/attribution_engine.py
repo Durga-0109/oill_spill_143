@@ -1,8 +1,13 @@
 import math
 import json
 import datetime
-from typing import List, Dict, Any, Tuple
-from shapely.geometry import Point, Polygon, LineString
+from typing import List, Dict, Any, Tuple, Optional
+try:
+    from shapely.geometry import Point, Polygon, LineString
+except ImportError:
+    Point = None
+    Polygon = None
+    LineString = None
 from dateutil import parser as date_parser
 from ais_processor import haversine_distance_km
 

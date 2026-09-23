@@ -175,6 +175,72 @@ class ExternalDataRecord(Base):
     data_json = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
+
+class AnalysisRecord(Base):
+    __tablename__ = "analysis_records"
+
+    id = Column(Integer, primary_key=True, index=True)
+    analysis_id = Column(String(100), unique=True, index=True, nullable=False)
+    mode = Column(String(50), default="manual") # manual, automatic
+    status = Column(String(50), default="completed") # completed, failed, processing
+    sha256_hash = Column(String(64), index=True, nullable=True)
+    oil_detected = Column(Boolean, default=True)
+    confidence = Column(Float, default=0.0)
+    spill_area_km2 = Column(Float, default=0.0)
+    latitude = Column(Float, default=11.230)
+    longitude = Column(Float, default=72.450)
+    model_name = Column(String(100), default="ResNet-18 + Attention Segmentor")
+    model_version = Column(String(50), default="1.0.0")
+    model_hash = Column(String(64), nullable=True)
+    processing_time_seconds = Column(Float, default=0.0)
+    raw_results_json = Column(Text, nullable=True)
+    report_url = Column(String(500), nullable=True)
+    operator_id = Column(String(100), default="OPERATOR-01")
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class UploadedImage(Base):
+    __tablename__ = "uploaded_images"
+
+    id = Column(Integer, primary_key=True, index=True)
+    file_id = Column(String(100), unique=True, index=True)
+    original_filename = Column(String(255), nullable=False)
+    sha256_hash = Column(String(64), index=True, nullable=False)
+    file_size_bytes = Column(Integer, default=0)
+    evidence_url = Column(String(500), nullable=True)
+    processed_url = Column(String(500), nullable=True)
+    has_geospatial = Column(Boolean, default=False)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+    operator_id = Column(String(100), default="OPERATOR-01")
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class SegmentationResult(Base):
+    __tablename__ = "segmentation_results"
+
+    id = Column(Integer, primary_key=True, index=True)
+    analysis_id = Column(String(100), index=True, nullable=False)
+    mask_url = Column(String(500), nullable=True)
+    overlay_url = Column(String(500), nullable=True)
+    spill_area_km2 = Column(Float, default=0.0)
+    pixel_coverage_pct = Column(Float, default=0.0)
+    bounding_box_json = Column(Text, nullable=True)
+    geojson_polygon = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+    operator = Column(String(100), default="OPERATOR-01")
+    action = Column(String(100), nullable=False, index=True)
+    analysis_id = Column(String(100), nullable=True, index=True)
+    details_json = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+
 def init_db():
     Base.metadata.create_all(bind=engine)
 
@@ -184,3 +250,4 @@ def get_db():
         yield db
     finally:
         db.close()
+

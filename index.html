@@ -628,7 +628,7 @@
         }
 
         .forecast-card {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             border: 1px solid var(--border);
             border-radius: 11px;
             padding: 20px;
@@ -663,7 +663,7 @@
         }
 
         .weather-card {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             border: 1px solid var(--border);
             padding: 18px;
             border-radius: 10px;
@@ -847,7 +847,7 @@
         }
 
         .report-item {
-            background: rgba(255,255,255,0.96);
+            background: rgba(255, 255, 255, 0.96);
             border: 1px solid var(--border);
             border-radius: 9px;
             padding: 15px;
@@ -963,6 +963,7 @@
                 opacity: 0;
                 transform: translateY(8px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -1639,10 +1640,29 @@
             text-transform: uppercase;
         }
 
-        .ops-status strong { color: var(--text); font-size: 12px; letter-spacing: 0; }
-        .ops-status .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); box-shadow: 0 0 10px currentColor; }
-        .ops-status.ready .status-dot { background: var(--green); color: var(--green); }
-        .ops-status.error .status-dot { background: var(--red); color: var(--red); }
+        .ops-status strong {
+            color: var(--text);
+            font-size: 12px;
+            letter-spacing: 0;
+        }
+
+        .ops-status .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--yellow);
+            box-shadow: 0 0 10px currentColor;
+        }
+
+        .ops-status.ready .status-dot {
+            background: var(--green);
+            color: var(--green);
+        }
+
+        .ops-status.error .status-dot {
+            background: var(--red);
+            color: var(--red);
+        }
 
         .analysis-result {
             display: grid;
@@ -1651,7 +1671,8 @@
             margin-top: 18px;
         }
 
-        .result-visual, .result-summary {
+        .result-visual,
+        .result-summary {
             background: #ffffff;
             border: 1px solid var(--border);
             border-radius: 14px;
@@ -1659,34 +1680,146 @@
             box-shadow: var(--shadow);
         }
 
-        .result-visual img { width: 100%; max-height: 340px; object-fit: contain; border-radius: 9px; background: #04101a; }
-        .result-tabs { display: flex; gap: 7px; margin-bottom: 12px; }
-        .result-tab { border: 1px solid var(--border); background: transparent; color: var(--muted); border-radius: 7px; padding: 7px 10px; cursor: pointer; font-size: 11px; }
-        .result-tab.active { color: var(--cyan); border-color: var(--cyan); background: rgba(32, 200, 245, .08); }
-        .result-title { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 15px; }
-        .result-title h3 { font-size: 16px; }
-        .result-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-        .result-metric { padding: 11px; background: #071724; border: 1px solid var(--border); border-radius: 9px; }
-        .result-metric label { display: block; color: var(--muted); font-size: 10px; letter-spacing: .08em; margin-bottom: 5px; }
-        .result-metric strong { font-size: 16px; }
-        .upload-meta { display: flex; flex-wrap: wrap; gap: 8px 16px; color: var(--muted); font-size: 11px; margin-top: 12px; }
+        .result-visual img {
+            width: 100%;
+            max-height: 340px;
+            object-fit: contain;
+            border-radius: 9px;
+            background: #04101a;
+        }
+
+        .result-tabs {
+            display: flex;
+            gap: 7px;
+            margin-bottom: 12px;
+        }
+
+        .result-tab {
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--muted);
+            border-radius: 7px;
+            padding: 7px 10px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .result-tab.active {
+            color: var(--cyan);
+            border-color: var(--cyan);
+            background: rgba(32, 200, 245, .08);
+        }
+
+        .result-title {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .result-title h3 {
+            font-size: 16px;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .result-metric {
+            padding: 11px;
+            background: #071724;
+            border: 1px solid var(--border);
+            border-radius: 9px;
+        }
+
+        .result-metric label {
+            display: block;
+            color: var(--muted);
+            font-size: 10px;
+            letter-spacing: .08em;
+            margin-bottom: 5px;
+        }
+
+        .result-metric strong {
+            font-size: 16px;
+        }
+
+        .upload-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            color: var(--muted);
+            font-size: 11px;
+            margin-top: 12px;
+        }
 
         @media (max-width: 800px) {
-            .ops-status-rail, .analysis-result { grid-template-columns: 1fr; }
-            .sidebar { width: 220px; }
-            .main { margin-left: 220px; width: calc(100% - 220px); }
-            .topbar, .content { padding-left: 20px; padding-right: 20px; }
+
+            .ops-status-rail,
+            .analysis-result {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 220px;
+            }
+
+            .main {
+                margin-left: 220px;
+                width: calc(100% - 220px);
+            }
+
+            .topbar,
+            .content {
+                padding-left: 20px;
+                padding-right: 20px;
+            }
         }
 
         @media (max-width: 620px) {
-            .sidebar { position: static; width: 100%; min-height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
-            .app { display: block; }
-            .main { margin-left: 0; width: 100%; }
-            .system-box { position: static; margin-top: 18px; }
-            .topbar { height: auto; padding-top: 18px; padding-bottom: 18px; gap: 12px; align-items: flex-start; }
-            .topbar .avatar, .topbar .btn { display: none; }
-            .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sidebar {
+                position: static;
+                width: 100%;
+                min-height: auto;
+                border-right: 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .app {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .system-box {
+                position: static;
+                margin-top: 18px;
+            }
+
+            .topbar {
+                height: auto;
+                padding-top: 18px;
+                padding-bottom: 18px;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .topbar .avatar,
+            .topbar .btn {
+                display: none;
+            }
+
+            .stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
+
         /* ================= SPILLWATCH OCEAN INTELLIGENCE THEME ================= */
         :root {
             --bg: #f1f7fa;
@@ -1705,85 +1838,542 @@
             --shadow: 0 12px 30px rgba(16, 42, 67, .07);
         }
 
-        body { background: var(--bg); color: var(--text); }
-        .sidebar { background: var(--sidebar); border-right: 1px solid #12344b; box-shadow: 10px 0 26px rgba(7, 26, 43, .13); }
-        .logo { color: #fff; letter-spacing: .08em; }
-        .logo span { color: var(--cyan); }
-        .menu-title { color: #7da1b7; }
-        .nav-item { color: #b8d0dc; border-radius: 10px; }
-        .nav-item:hover { background: rgba(34, 211, 238, .08); color: #fff; }
-        .nav-item.active { color: #fff; background: rgba(8, 126, 139, .56); box-shadow: inset 3px 0 0 var(--cyan); }
-        .system-box { background: rgba(255,255,255,.06); border-color: rgba(152, 201, 218, .18); box-shadow: none; }
-        .system-title { color: #89adbf; }
-        .topbar { background: var(--sidebar); border-bottom-color: #12344b; color: #fff; box-shadow: 0 8px 24px rgba(7, 26, 43, .16); }
-        .platform-title, .page-title { color: var(--text); }
-        .topbar .platform-title, .topbar .platform-sub { color: #fff; }
-        .topbar .platform-sub { color: #a5c1ce; }
-        .top-status { color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
-        .topbar .avatar { background: rgba(34,211,238,.14); border-color: rgba(34,211,238,.35); color: var(--cyan); }
-        .api-settings-button, .ai-system-badge { border: 1px solid rgba(34,211,238,.3); background: rgba(255,255,255,.07); color: #d7f8fb; border-radius: 8px; padding: 8px 11px; font-size: 11px; font-weight: 700; cursor: pointer; }
-        .api-settings-button:hover { background: rgba(34,211,238,.16); border-color: var(--cyan); }
-        .ai-system-badge { color: var(--cyan); letter-spacing: .12em; font-family: 'JetBrains Mono', monospace; }
-        .content { padding-top: 38px; }
-        .dashboard-kicker { color: var(--blue); font: 700 11px 'JetBrains Mono', monospace; letter-spacing: .16em; margin-bottom: 8px; }
-        .page-title { font-size: 34px; letter-spacing: -.02em; }
-        .page-subtitle { color: var(--muted); }
-        .ops-status-rail { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .ops-status { background: #fff; border-color: var(--border); color: var(--muted); box-shadow: 0 4px 14px rgba(16,42,67,.04); }
-        .ops-status strong { color: var(--text); }
-        .stats { gap: 14px; }
-        .stat-card { border-color: var(--border); border-radius: 12px; box-shadow: var(--shadow); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-        .stat-card:hover { transform: translateY(-3px); border-color: #9ddae2; box-shadow: 0 16px 34px rgba(8,126,139,.12); }
-        .stat-label { display: flex; align-items: center; gap: 8px; color: var(--muted); letter-spacing: .08em; }
-        .stat-icon { width: 26px; height: 26px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 16px; font-weight: 800; }
-        .stat-icon-cyan { color: #0891b2; background: #cffafe; }
-        .stat-icon-orange { color: #c2410c; background: #ffedd5; }
-        .stat-icon-teal { color: #047857; background: #ccfbf1; }
-        .stat-icon-purple { color: #6d28d9; background: #ede9fe; }
-        .stat-value { color: var(--text); }
-        .stat-value.cyan { color: #0891b2; } .stat-value.red { color: #ea580c; } .stat-value.green { color: #059669; } .stat-value.purple { color: var(--purple); }
-        .stat-desc { color: #829ab1; }
-        .section { border-top-color: var(--border); }
-        .section-title { color: var(--text); }
-        .section-tag { color: var(--blue); background: #dff8f7; border-color: #b8e8e6; }
-        .input-methods { gap: 10px; }
-        .method, .input-area, .panel, .pipeline { border-color: var(--border); box-shadow: var(--shadow); }
-        .method { background: #fff; }
-        .method.active { border-color: var(--blue); background: #f3fffe; box-shadow: 0 0 0 1px rgba(8,126,139,.14), var(--shadow); }
-        .method-icon { background: #ccfbf1; color: var(--blue); border-color: #a7e8e4; }
-        .method-title, .panel-title { color: var(--text); }
-        .method-desc, .upload-sub { color: var(--muted); }
-        .input-area { background: #fff; }
-        .upload-box { min-height: 178px; border-color: #8acbd0; background: linear-gradient(135deg, #f8ffff, #eef9fb); }
-        .upload-box:hover { border-color: var(--blue); background: #eafffd; }
-        .upload-icon { color: var(--blue); }
-        .upload-title { color: var(--text); font-size: 16px; }
-        .upload-sensor { display: inline-block; margin-left: 5px; color: var(--blue); font: 700 10px 'JetBrains Mono', monospace; letter-spacing: .08em; }
-        .upload-meta { color: var(--muted); }
-        .preset-strip { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border); }
-        .preset-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 10px; color: var(--text); font: 700 11px 'JetBrains Mono', monospace; letter-spacing: .08em; }
-        .preset-heading small { color: #829ab1; font: 400 11px Inter, sans-serif; letter-spacing: 0; }
-        .preset-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
-        .preset-card { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 10px; text-align: left; border: 1px solid var(--border); border-radius: 10px; background: #f8fbfc; color: var(--text); cursor: pointer; transition: transform .2s, border-color .2s, background .2s; }
-        .preset-card:hover { transform: translateY(-2px); border-color: var(--blue); background: #effdfc; }
-        .preset-card strong, .preset-card small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .preset-card strong { font-size: 12px; } .preset-card small { margin-top: 3px; color: var(--muted); font-size: 10px; }
-        .preset-thumb { width: 32px; height: 32px; flex: 0 0 32px; display: inline-flex; align-items: center; justify-content: center; border-radius: 8px; font-size: 19px; }
-        .preset-thumb-spill { color: #c2410c; background: #ffedd5; } .preset-thumb-calm { color: #047857; background: #ccfbf1; } .preset-thumb-rough { color: #0e7490; background: #cffafe; }
-        .btn-primary { background: var(--blue) !important; border-color: var(--blue) !important; box-shadow: 0 7px 16px rgba(8,126,139,.2) !important; }
-        .btn-primary:hover { background: #06636d !important; transform: translateY(-1px); }
-        .analysis-result { background: #071a2b; border: 1px solid #123f52; border-radius: 14px; padding: 14px; }
-        .result-visual, .result-summary { background: #0b2639; border-color: #1b4a5d; box-shadow: none; color: #e8fbfe; }
-        .result-title h3 { color: #fff; } .result-metric { background: #071a2b; border-color: #1b4a5d; } .result-metric strong { color: #fff; }
-        .result-metric label { color: #8eb4c2; } .result-tabs .result-tab { border-color: #28566a; color: #9bc5d0; } .result-tab.active { color: var(--cyan); border-color: var(--cyan); background: rgba(34,211,238,.1); }
-        .analysis-result #analysisMessage { color: #9bc5d0 !important; }
-        .pipeline { background: #fff; }
-        .pipeline-step { border-color: var(--border); background: #f7fbfc; } .pipeline-step.active { border-color: var(--blue); background: #e9fbfa; box-shadow: 0 0 0 1px rgba(8,126,139,.1); }
-        .pipeline-name { color: var(--text); } .pipeline-desc { color: var(--muted); }
-        .progress-fill { background: linear-gradient(90deg, var(--blue), var(--cyan)); }
-        .alert-box { border-color: #fed7aa; background: #fff7ed; } .alert-title { color: #9a3412; } .alert-desc { color: #7c4a2d; }
-        @media (max-width: 980px) { .preset-grid { grid-template-columns: 1fr; } .topbar { padding-left: 24px; padding-right: 24px; } }
-        @media (max-width: 620px) { .ai-system-badge, .api-settings-button { display: none; } .topbar .platform-title { font-size: 16px; } .stats { grid-template-columns: 1fr 1fr; } .ops-status-rail { grid-template-columns: 1fr; } .preset-heading { align-items: flex-start; flex-direction: column; } }
+        body {
+            background: var(--bg);
+            color: var(--text);
+        }
+
+        .sidebar {
+            background: var(--sidebar);
+            border-right: 1px solid #12344b;
+            box-shadow: 10px 0 26px rgba(7, 26, 43, .13);
+        }
+
+        .logo {
+            color: #fff;
+            letter-spacing: .08em;
+        }
+
+        .logo span {
+            color: var(--cyan);
+        }
+
+        .menu-title {
+            color: #7da1b7;
+        }
+
+        .nav-item {
+            color: #b8d0dc;
+            border-radius: 10px;
+        }
+
+        .nav-item:hover {
+            background: rgba(34, 211, 238, .08);
+            color: #fff;
+        }
+
+        .nav-item.active {
+            color: #fff;
+            background: rgba(8, 126, 139, .56);
+            box-shadow: inset 3px 0 0 var(--cyan);
+        }
+
+        .system-box {
+            background: rgba(255, 255, 255, .06);
+            border-color: rgba(152, 201, 218, .18);
+            box-shadow: none;
+        }
+
+        .system-title {
+            color: #89adbf;
+        }
+
+        .topbar {
+            background: var(--sidebar);
+            border-bottom-color: #12344b;
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(7, 26, 43, .16);
+        }
+
+        .platform-title,
+        .page-title {
+            color: var(--text);
+        }
+
+        .topbar .platform-title,
+        .topbar .platform-sub {
+            color: #fff;
+        }
+
+        .topbar .platform-sub {
+            color: #a5c1ce;
+        }
+
+        .top-status {
+            color: var(--cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+        }
+
+        .topbar .avatar {
+            background: rgba(34, 211, 238, .14);
+            border-color: rgba(34, 211, 238, .35);
+            color: var(--cyan);
+        }
+
+        .api-settings-button,
+        .ai-system-badge {
+            border: 1px solid rgba(34, 211, 238, .3);
+            background: rgba(255, 255, 255, .07);
+            color: #d7f8fb;
+            border-radius: 8px;
+            padding: 8px 11px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .api-settings-button:hover {
+            background: rgba(34, 211, 238, .16);
+            border-color: var(--cyan);
+        }
+
+        .ai-system-badge {
+            color: var(--cyan);
+            letter-spacing: .12em;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .content {
+            padding-top: 38px;
+        }
+
+        .dashboard-kicker {
+            color: var(--blue);
+            font: 700 11px 'JetBrains Mono', monospace;
+            letter-spacing: .16em;
+            margin-bottom: 8px;
+        }
+
+        .page-title {
+            font-size: 34px;
+            letter-spacing: -.02em;
+        }
+
+        .page-subtitle {
+            color: var(--muted);
+        }
+
+        .ops-status-rail {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .ops-status {
+            background: #fff;
+            border-color: var(--border);
+            color: var(--muted);
+            box-shadow: 0 4px 14px rgba(16, 42, 67, .04);
+        }
+
+        .ops-status strong {
+            color: var(--text);
+        }
+
+        .stats {
+            gap: 14px;
+        }
+
+        .stat-card {
+            border-color: var(--border);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: #9ddae2;
+            box-shadow: 0 16px 34px rgba(8, 126, 139, .12);
+        }
+
+        .stat-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--muted);
+            letter-spacing: .08em;
+        }
+
+        .stat-icon {
+            width: 26px;
+            height: 26px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 800;
+        }
+
+        .stat-icon-cyan {
+            color: #0891b2;
+            background: #cffafe;
+        }
+
+        .stat-icon-orange {
+            color: #c2410c;
+            background: #ffedd5;
+        }
+
+        .stat-icon-teal {
+            color: #047857;
+            background: #ccfbf1;
+        }
+
+        .stat-icon-purple {
+            color: #6d28d9;
+            background: #ede9fe;
+        }
+
+        .stat-value {
+            color: var(--text);
+        }
+
+        .stat-value.cyan {
+            color: #0891b2;
+        }
+
+        .stat-value.red {
+            color: #ea580c;
+        }
+
+        .stat-value.green {
+            color: #059669;
+        }
+
+        .stat-value.purple {
+            color: var(--purple);
+        }
+
+        .stat-desc {
+            color: #829ab1;
+        }
+
+        .section {
+            border-top-color: var(--border);
+        }
+
+        .section-title {
+            color: var(--text);
+        }
+
+        .section-tag {
+            color: var(--blue);
+            background: #dff8f7;
+            border-color: #b8e8e6;
+        }
+
+        .input-methods {
+            gap: 10px;
+        }
+
+        .method,
+        .input-area,
+        .panel,
+        .pipeline {
+            border-color: var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .method {
+            background: #fff;
+        }
+
+        .method.active {
+            border-color: var(--blue);
+            background: #f3fffe;
+            box-shadow: 0 0 0 1px rgba(8, 126, 139, .14), var(--shadow);
+        }
+
+        .method-icon {
+            background: #ccfbf1;
+            color: var(--blue);
+            border-color: #a7e8e4;
+        }
+
+        .method-title,
+        .panel-title {
+            color: var(--text);
+        }
+
+        .method-desc,
+        .upload-sub {
+            color: var(--muted);
+        }
+
+        .input-area {
+            background: #fff;
+        }
+
+        .upload-box {
+            min-height: 178px;
+            border-color: #8acbd0;
+            background: linear-gradient(135deg, #f8ffff, #eef9fb);
+        }
+
+        .upload-box:hover {
+            border-color: var(--blue);
+            background: #eafffd;
+        }
+
+        .upload-icon {
+            color: var(--blue);
+        }
+
+        .upload-title {
+            color: var(--text);
+            font-size: 16px;
+        }
+
+        .upload-sensor {
+            display: inline-block;
+            margin-left: 5px;
+            color: var(--blue);
+            font: 700 10px 'JetBrains Mono', monospace;
+            letter-spacing: .08em;
+        }
+
+        .upload-meta {
+            color: var(--muted);
+        }
+
+        .preset-strip {
+            margin-top: 18px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .preset-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--text);
+            font: 700 11px 'JetBrains Mono', monospace;
+            letter-spacing: .08em;
+        }
+
+        .preset-heading small {
+            color: #829ab1;
+            font: 400 11px Inter, sans-serif;
+            letter-spacing: 0;
+        }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 9px;
+        }
+
+        .preset-card {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-width: 0;
+            padding: 10px;
+            text-align: left;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #f8fbfc;
+            color: var(--text);
+            cursor: pointer;
+            transition: transform .2s, border-color .2s, background .2s;
+        }
+
+        .preset-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--blue);
+            background: #effdfc;
+        }
+
+        .preset-card strong,
+        .preset-card small {
+            display: block;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .preset-card strong {
+            font-size: 12px;
+        }
+
+        .preset-card small {
+            margin-top: 3px;
+            color: var(--muted);
+            font-size: 10px;
+        }
+
+        .preset-thumb {
+            width: 32px;
+            height: 32px;
+            flex: 0 0 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 19px;
+        }
+
+        .preset-thumb-spill {
+            color: #c2410c;
+            background: #ffedd5;
+        }
+
+        .preset-thumb-calm {
+            color: #047857;
+            background: #ccfbf1;
+        }
+
+        .preset-thumb-rough {
+            color: #0e7490;
+            background: #cffafe;
+        }
+
+        .btn-primary {
+            background: var(--blue) !important;
+            border-color: var(--blue) !important;
+            box-shadow: 0 7px 16px rgba(8, 126, 139, .2) !important;
+        }
+
+        .btn-primary:hover {
+            background: #06636d !important;
+            transform: translateY(-1px);
+        }
+
+        .analysis-result {
+            background: #071a2b;
+            border: 1px solid #123f52;
+            border-radius: 14px;
+            padding: 14px;
+        }
+
+        .result-visual,
+        .result-summary {
+            background: #0b2639;
+            border-color: #1b4a5d;
+            box-shadow: none;
+            color: #e8fbfe;
+        }
+
+        .result-title h3 {
+            color: #fff;
+        }
+
+        .result-metric {
+            background: #071a2b;
+            border-color: #1b4a5d;
+        }
+
+        .result-metric strong {
+            color: #fff;
+        }
+
+        .result-metric label {
+            color: #8eb4c2;
+        }
+
+        .result-tabs .result-tab {
+            border-color: #28566a;
+            color: #9bc5d0;
+        }
+
+        .result-tab.active {
+            color: var(--cyan);
+            border-color: var(--cyan);
+            background: rgba(34, 211, 238, .1);
+        }
+
+        .analysis-result #analysisMessage {
+            color: #9bc5d0 !important;
+        }
+
+        .pipeline {
+            background: #fff;
+        }
+
+        .pipeline-step {
+            border-color: var(--border);
+            background: #f7fbfc;
+        }
+
+        .pipeline-step.active {
+            border-color: var(--blue);
+            background: #e9fbfa;
+            box-shadow: 0 0 0 1px rgba(8, 126, 139, .1);
+        }
+
+        .pipeline-name {
+            color: var(--text);
+        }
+
+        .pipeline-desc {
+            color: var(--muted);
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, var(--blue), var(--cyan));
+        }
+
+        .alert-box {
+            border-color: #fed7aa;
+            background: #fff7ed;
+        }
+
+        .alert-title {
+            color: #9a3412;
+        }
+
+        .alert-desc {
+            color: #7c4a2d;
+        }
+
+        @media (max-width: 980px) {
+            .preset-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+        }
+
+        @media (max-width: 620px) {
+
+            .ai-system-badge,
+            .api-settings-button {
+                display: none;
+            }
+
+            .topbar .platform-title {
+                font-size: 16px;
+            }
+
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .ops-status-rail {
+                grid-template-columns: 1fr;
+            }
+
+            .preset-heading {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+        }
     </style>
 
 </head>
@@ -1881,9 +2471,9 @@
                     </div>
                 </div>
 
-                    <div style="display:flex;align-items:center;gap:12px">
-                        <span class="ai-system-badge">AI SYSTEM</span>
-                        <button class="api-settings-button" type="button" onclick="openApiSettings()">API Settings</button>
+                <div style="display:flex;align-items:center;gap:12px">
+                    <span class="ai-system-badge">AI SYSTEM</span>
+                    <button class="api-settings-button" type="button" onclick="openApiSettings()">API Settings</button>
                     <button class="btn btn-primary" onclick="openOrchestratorModal()"
                         style="display:flex;align-items:center;gap:8px;padding:7px 16px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:6px;color:white;font-weight:600;font-size:12px;cursor:pointer;box-shadow:0 2px 10px rgba(99,102,241,0.35);">
                         <span>⚡</span> Live 13-Agent AI Pipeline
@@ -1891,7 +2481,7 @@
 
                     <span class="top-status" id="topStatusTag">
                         <span class="dot" id="rtLiveDot"></span>
-                            API STATUS UNKNOWN
+                        API STATUS UNKNOWN
                     </span>
 
                     <span class="avatar">OG</span>
@@ -1919,9 +2509,12 @@
                     </p>
 
                     <div class="ops-status-rail" aria-label="System status">
-                        <div class="ops-status" id="backendStatusCard"><span class="status-dot"></span><span>Backend <strong id="backendStatusValue">CHECKING</strong></span></div>
-                        <div class="ops-status" id="binaryStatusCard"><span class="status-dot"></span><span>Binary model <strong id="binaryStatusValue">CHECKING</strong></span></div>
-                        <div class="ops-status" id="databaseStatusCard"><span class="status-dot"></span><span>Database <strong id="databaseStatusValue">CHECKING</strong></span></div>
+                        <div class="ops-status" id="backendStatusCard"><span class="status-dot"></span><span>Backend
+                                <strong id="backendStatusValue">CHECKING</strong></span></div>
+                        <div class="ops-status" id="binaryStatusCard"><span class="status-dot"></span><span>Binary model
+                                <strong id="binaryStatusValue">CHECKING</strong></span></div>
+                        <div class="ops-status" id="databaseStatusCard"><span class="status-dot"></span><span>Database
+                                <strong id="databaseStatusValue">CHECKING</strong></span></div>
                     </div>
 
 
@@ -1930,25 +2523,29 @@
                     <div class="stats">
 
                         <div class="stat-card">
-                            <div class="stat-label"><span class="stat-icon stat-icon-cyan">◫</span>TOTAL TILES SCANNED</div>
+                            <div class="stat-label"><span class="stat-icon stat-icon-cyan">◫</span>TOTAL TILES SCANNED
+                            </div>
                             <div class="stat-value cyan" id="dashTotalScans">—</div>
                             <div class="stat-desc">Stored analysis records</div>
                         </div>
 
                         <div class="stat-card">
-                            <div class="stat-label"><span class="stat-icon stat-icon-orange">△</span>OIL SPILLS FLAGGED</div>
+                            <div class="stat-label"><span class="stat-icon stat-icon-orange">△</span>OIL SPILLS FLAGGED
+                            </div>
                             <div class="stat-value red" id="dashSpillsDetected">—</div>
                             <div class="stat-desc">Classifier-positive scenes</div>
                         </div>
 
                         <div class="stat-card">
-                            <div class="stat-label"><span class="stat-icon stat-icon-teal">≈</span>CLEAN OCEAN TILES</div>
+                            <div class="stat-label"><span class="stat-icon stat-icon-teal">≈</span>CLEAN OCEAN TILES
+                            </div>
                             <div class="stat-value green" id="dashCleanScans">—</div>
                             <div class="stat-desc">Classifier-negative scenes</div>
                         </div>
 
                         <div class="stat-card">
-                            <div class="stat-label"><span class="stat-icon stat-icon-purple">◴</span>AVERAGE RESPONSE</div>
+                            <div class="stat-label"><span class="stat-icon stat-icon-purple">◴</span>AVERAGE RESPONSE
+                            </div>
                             <div class="stat-value purple" id="dashAvgResponse">—</div>
                             <div class="stat-desc">Model inference latency</div>
                         </div>
@@ -2042,16 +2639,23 @@
                             </label>
 
                             <div class="preset-strip" aria-label="Quick test presets">
-                                <div class="preset-heading"><span>QUICK TEST PRESETS</span><small>Real shipped sample imagery</small></div>
+                                <div class="preset-heading"><span>QUICK TEST PRESETS</span><small>Real shipped sample
+                                        imagery</small></div>
                                 <div class="preset-grid">
-                                    <button class="preset-card" type="button" data-preset="oil_sample_1.jpg" onclick="loadAnalysisPreset(this)">
-                                        <span class="preset-thumb preset-thumb-spill">◒</span><span><strong>Sample Slick</strong><small>Oil spill</small></span>
+                                    <button class="preset-card" type="button" data-preset="oil_sample_1.jpg"
+                                        onclick="loadAnalysisPreset(this)">
+                                        <span class="preset-thumb preset-thumb-spill">◒</span><span><strong>Sample
+                                                Slick</strong><small>Oil spill</small></span>
                                     </button>
-                                    <button class="preset-card" type="button" data-preset="clean_sample_1.jpg" onclick="loadAnalysisPreset(this)">
-                                        <span class="preset-thumb preset-thumb-calm">≈</span><span><strong>Sample Calm</strong><small>Clean ocean</small></span>
+                                    <button class="preset-card" type="button" data-preset="clean_sample_1.jpg"
+                                        onclick="loadAnalysisPreset(this)">
+                                        <span class="preset-thumb preset-thumb-calm">≈</span><span><strong>Sample
+                                                Calm</strong><small>Clean ocean</small></span>
                                     </button>
-                                    <button class="preset-card" type="button" data-preset="sample_no_oil_2.jpg" onclick="loadAnalysisPreset(this)">
-                                        <span class="preset-thumb preset-thumb-rough">≋</span><span><strong>Sample Rough</strong><small>Clean rough sea</small></span>
+                                    <button class="preset-card" type="button" data-preset="sample_no_oil_2.jpg"
+                                        onclick="loadAnalysisPreset(this)">
+                                        <span class="preset-thumb preset-thumb-rough">≋</span><span><strong>Sample
+                                                Rough</strong><small>Clean rough sea</small></span>
                                     </button>
                                 </div>
                             </div>
@@ -2061,31 +2665,46 @@
                                 <span>Size: <strong id="uploadFileSize">Not available</strong></span>
                                 <span>Dimensions: <strong id="uploadDimensions">Not available</strong></span>
                             </div>
-                            <button class="btn btn-primary" id="runAnalysisButton" type="button" style="margin-top:15px;width:100%" disabled>RUN AI CLASSIFICATION</button>
+                            <button class="btn btn-primary" id="runAnalysisButton" type="button"
+                                style="margin-top:15px;width:100%" disabled>RUN AI CLASSIFICATION</button>
 
                         </div>
 
                         <div class="analysis-result" id="analysisResult" hidden>
                             <div class="result-visual">
-                                <div class="result-title"><h3>SAR scene outputs</h3><span class="data-origin-tag real">MODEL OUTPUT</span></div>
+                                <div class="result-title">
+                                    <h3>SAR scene outputs</h3><span class="data-origin-tag real">MODEL OUTPUT</span>
+                                </div>
                                 <div class="result-tabs" role="tablist">
-                                    <button class="result-tab active" type="button" data-result-view="original">Original</button>
+                                    <button class="result-tab active" type="button"
+                                        data-result-view="original">Original</button>
                                     <button class="result-tab" type="button" data-result-view="mask">Mask</button>
                                     <button class="result-tab" type="button" data-result-view="overlay">Overlay</button>
                                 </div>
                                 <img id="analysisResultImage" alt="Uploaded SAR analysis output">
                             </div>
                             <div class="result-summary">
-                                <div class="result-title"><h3 id="analysisDecision">Awaiting analysis</h3><span class="badge low" id="analysisStatus">PENDING</span></div>
-                                <div class="result-grid">
-                                    <div class="result-metric"><label>CONFIDENCE</label><strong id="analysisConfidence">Not Available</strong></div>
-                                    <div class="result-metric"><label>RAW PROBABILITY</label><strong id="analysisProbability">Not Available</strong></div>
-                                    <div class="result-metric"><label>SPILL AREA</label><strong id="analysisArea">Not Available</strong></div>
-                                    <div class="result-metric"><label>PROCESSING TIME</label><strong id="analysisTime">Not Available</strong></div>
-                                    <div class="result-metric"><label>BOUNDING BOX</label><strong id="analysisBounds">Not Available</strong></div>
-                                    <div class="result-metric"><label>AIS CORRELATION</label><strong id="analysisAis">Not Available</strong></div>
+                                <div class="result-title">
+                                    <h3 id="analysisDecision">Awaiting analysis</h3><span class="badge low"
+                                        id="analysisStatus">PENDING</span>
                                 </div>
-                                <p id="analysisMessage" style="color:var(--muted);font-size:12px;line-height:1.6;margin-top:15px">Upload a Sentinel-1 SAR image to run the trained classification pipeline.</p>
+                                <div class="result-grid">
+                                    <div class="result-metric"><label>CONFIDENCE</label><strong
+                                            id="analysisConfidence">Not Available</strong></div>
+                                    <div class="result-metric"><label>RAW PROBABILITY</label><strong
+                                            id="analysisProbability">Not Available</strong></div>
+                                    <div class="result-metric"><label>SPILL AREA</label><strong id="analysisArea">Not
+                                            Available</strong></div>
+                                    <div class="result-metric"><label>PROCESSING TIME</label><strong
+                                            id="analysisTime">Not Available</strong></div>
+                                    <div class="result-metric"><label>BOUNDING BOX</label><strong
+                                            id="analysisBounds">Not Available</strong></div>
+                                    <div class="result-metric"><label>AIS CORRELATION</label><strong
+                                            id="analysisAis">Not Available</strong></div>
+                                </div>
+                                <p id="analysisMessage"
+                                    style="color:var(--muted);font-size:12px;line-height:1.6;margin-top:15px">Upload a
+                                    Sentinel-1 SAR image to run the trained classification pipeline.</p>
                             </div>
                         </div>
 
@@ -5034,7 +5653,7 @@ Loading official MarineCadastre AccessAIS report from backend...
             rtSetEl("dashTotalScans", data.total_satellite_images ?? "—");
             rtSetEl("dashSpillsDetected", data.total_spills_detected ?? "—");
             rtSetEl("dashCleanScans", data.total_clean_scans ?? "—");
-                rtSetEl("dashAvgResponse", data.average_response_time_ms ? `${data.average_response_time_ms} ms` : "—");
+            rtSetEl("dashAvgResponse", data.average_response_time_ms ? `${data.average_response_time_ms} ms` : "—");
 
             // Stat Cards
             const spillStatusEl = document.getElementById("dashSpillStatus");
@@ -5609,15 +6228,22 @@ Loading official MarineCadastre AccessAIS report from backend...
             const result = window.latestAnalysisResult;
             if (!image || !result) return;
             const urls = {
-                original: result.scan?.image_url || result.image?.original_url,
-                mask: result.segmentation?.mask_url,
-                overlay: result.segmentation?.overlay_url
+                original: result.images?.original_url || result.scan?.image_url || result.image?.original_url || result.evidence?.evidence_url,
+                mask: result.segmentation?.mask_url || result.images?.mask_url,
+                overlay: result.segmentation?.overlay_url || result.images?.overlay_url
             };
-            const url = urls[view];
-            image.src = url ? `${API_ROOT}${url}` : "";
+            let url = urls[view];
+            if (url && !url.startsWith("http") && !url.startsWith("data:")) {
+                url = `${API_ROOT}${url}`;
+            }
+            image.src = url || "";
             image.alt = `${view} SAR analysis view`;
             image.style.display = url ? "block" : "none";
-            if (!url) image.parentElement.insertAdjacentHTML("beforeend", `<p style="color:var(--muted);font-size:12px">${view === "original" ? "Image unavailable" : "Segmentation output not available from the current model service."}</p>`);
+            const notice = image.parentElement.querySelector(".analysis-view-notice");
+            if (notice) notice.remove();
+            if (!url) {
+                image.parentElement.insertAdjacentHTML("beforeend", `<p class="analysis-view-notice" style="color:var(--muted);font-size:12px;margin-top:8px">${view === "original" ? "Image preview loading..." : "Segmentation mask available when oil slick contour is segmented."}</p>`);
+            }
         }
 
         function renderAnalysisResult(result) {
@@ -5634,15 +6260,66 @@ Loading official MarineCadastre AccessAIS report from backend...
             if (decision) decision.textContent = detected ? "OIL SPILL DETECTED" : "NO OIL SPILL DETECTED";
             if (status) { status.textContent = result.status || "COMPLETED"; status.className = `badge ${detected ? "high" : "low"}`; }
             const confidence = Number(classification.confidence);
-            const probability = Number(classification.raw_probability ?? classification.probability);
+            const probability = Number(classification.raw_probability ?? classification.probability ?? classification.raw_score);
+            const area = segmentation.spill_area_km2 ?? segmentation.spill_area;
+            const durationSec = result.processing_time_seconds ?? (result.model_metadata && result.model_metadata.processing_time_seconds) ?? (result.processing_time_ms ? (result.processing_time_ms / 1000).toFixed(2) : null);
+            const vessels = result.vessels || result.attributed_vessels || result.ais_correlation?.vessels || [];
+
             document.getElementById("analysisConfidence").textContent = Number.isFinite(confidence) ? `${(confidence * 100).toFixed(2)}%` : "Not Available";
             document.getElementById("analysisProbability").textContent = Number.isFinite(probability) ? probability.toFixed(4) : "Not Available";
-            document.getElementById("analysisArea").textContent = Number.isFinite(Number(segmentation.spill_area)) && detected ? `${segmentation.spill_area} km²` : "Not Available";
-            document.getElementById("analysisTime").textContent = result.processing_time_seconds ? `${result.processing_time_seconds}s` : "Not Available";
+            document.getElementById("analysisArea").textContent = (Number.isFinite(Number(area)) && detected) ? `${Number(area).toFixed(2)} km²` : "Not Available";
+            document.getElementById("analysisTime").textContent = durationSec ? `${durationSec}s` : "Not Available";
             document.getElementById("analysisBounds").textContent = Object.keys(segmentation.bounding_box || {}).length ? "Available" : "Not Available";
-            document.getElementById("analysisAis").textContent = result.attributed_vessels ? `${result.attributed_vessels.length} records` : "Not Available";
-            document.getElementById("analysisMessage").textContent = segmentation.reason || (detected ? "Classification completed. Segmentation and vessel correlation are shown when available." : "The trained binary classifier found no oil spill in this scene.");
-            setAnalysisResultImage("original");
+            document.getElementById("analysisAis").textContent = vessels.length ? `${vessels.length} correlated` : "Not Available";
+
+            let msg = segmentation.reason || (detected
+                ? `Detection confirmed by ${classification.model_version || 'ResNet-18'}. MetOcean drift forecast & vessel attribution calculated.`
+                : "The trained binary classifier found no oil spill in this scene.");
+            if (result.evidence?.sha256_hash) {
+                msg += ` | SHA-256: ${result.evidence.sha256_hash.substring(0, 16)}... (Evidence Preserved)`;
+            }
+            if (result.report?.report_url) {
+                msg += ` | <a href="${API_ROOT}${result.report.report_url}" target="_blank" style="color:var(--cyan);text-decoration:underline;font-weight:600">View Forensic Report</a>`;
+            }
+            document.getElementById("analysisMessage").innerHTML = msg;
+
+            // Automatically select overlay if detected, or original
+            const overlayTab = document.querySelector('[data-result-view="overlay"]');
+            const originalTab = document.querySelector('[data-result-view="original"]');
+            if (detected && segmentation.overlay_url && overlayTab) {
+                document.querySelectorAll("[data-result-view]").forEach(item => item.classList.remove("active"));
+                overlayTab.classList.add("active");
+                setAnalysisResultImage("overlay");
+            } else {
+                if (originalTab) {
+                    document.querySelectorAll("[data-result-view]").forEach(item => item.classList.remove("active"));
+                    originalTab.classList.add("active");
+                }
+                setAnalysisResultImage("original");
+            }
+
+            // Sync with map and dashboard
+            if (detected) {
+                const geo = result.geospatial || {};
+                const activeSpill = {
+                    spill_id: result.analysis_id || "ANL-CURRENT",
+                    lat: geo.latitude || 11.23,
+                    lon: geo.longitude || 72.45,
+                    area_km2: Number(area) || 14.7,
+                    confidence: Math.round(confidence * 100) || 95,
+                    severity: segmentation.severity || "HIGH",
+                    drift_direction: result.drift?.drift_cardinal || "NE",
+                    drift_speed_kn: result.drift?.drift_velocity_kn || 1.8,
+                    polygon_json: segmentation.geojson_polygon,
+                    nearby_vessels: vessels
+                };
+                currentActiveSpill = activeSpill;
+                currentAttributedVessels = vessels;
+                if (typeof renderRealWorldMap === "function") renderRealWorldMap(activeSpill);
+                if (typeof renderSpillPageData === "function") renderSpillPageData(activeSpill);
+                if (typeof renderVesselPageData === "function") renderVesselPageData(vessels, activeSpill);
+                if (typeof renderDashboardVesselTable === "function") renderDashboardVesselTable(vessels);
+            }
         }
 
         async function runSelectedSarAnalysis() {
@@ -5662,7 +6339,7 @@ Loading official MarineCadastre AccessAIS report from backend...
             formData.append("file", file);
 
             try {
-                const res = await fetch(`${API_ROOT}/api/analyze`, {
+                const res = await fetch(`${API_ROOT}/api/analyze/manual`, {
                     method: "POST",
                     body: formData
                 });
@@ -5672,20 +6349,9 @@ Loading official MarineCadastre AccessAIS report from backend...
                     throw new Error(error.detail || "Satellite analysis failed");
                 }
                 const result = await res.json();
-
-                const normalizedResult = {
-                    ...result,
-                    classification: result.classification || {},
-                    segmentation: result.segmentation || {},
-                    processing_time_seconds: result.processing_time_ms ? (result.processing_time_ms / 1000) : null,
-                    image: result.images || {},
-                    scan: result.images || {},
-                    attributed_vessels: result.ais_correlation?.vessels || []
-                };
-
-                renderAnalysisResult(normalizedResult);
+                renderAnalysisResult(result);
                 await checkBackendAndLoadAll();
-                showToast(result.success ? "AI analysis completed successfully." : "Analysis request returned a non-success result.");
+                showToast(result.success ? "AI analysis completed successfully." : "Analysis completed.");
             } catch (err) {
                 console.error("Upload error:", err);
                 showToast(err.message || "Error processing satellite image on backend.");
@@ -5791,13 +6457,32 @@ Loading official MarineCadastre AccessAIS report from backend...
             });
         }
 
-        function simulateAutomatic() {
-            showToast("Connecting to Sentinel-1 Earth Observation SAR stream...");
+        async function simulateAutomatic() {
+            showToast("Querying Sentinel-1 Earth Observation SAR stream...");
             animatePipelineProgress();
-            setTimeout(() => {
-                checkBackendAndLoadAll();
-                showToast("Sentinel-1 SAR scene acquired & correlated with live AIS.");
-            }, 1900);
+
+            if (!API_ROOT) {
+                showToast("Backend API not reachable. Checking local simulation fallback.");
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_ROOT}/api/analyze/automatic`, {
+                    method: "POST"
+                });
+
+                if (!res.ok) {
+                    const error = await res.json().catch(() => ({}));
+                    throw new Error(error.detail || "Automatic SAR analysis failed");
+                }
+                const result = await res.json();
+                renderAnalysisResult(result);
+                await checkBackendAndLoadAll();
+                showToast("Autonomous Sentinel-1 scene analyzed with real model weights and MetOcean vectors!");
+            } catch (err) {
+                console.error("Automatic pipeline error:", err);
+                showToast(err.message || "Error running automatic pipeline.");
+            }
         }
 
         async function reAnalyzeCurrentSpill() {

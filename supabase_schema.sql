@@ -1,101 +1,169 @@
-CREATE TABLE IF NOT EXISTS public.satellite_images (
+-- ====================================================================
+-- SpillWatch AI - Supabase PostgreSQL Schema & Storage Configuration
+-- Tables: users, analyses, segmentation_results, vessel_records, drift_predictions, audit_logs
+-- Storage Buckets: sar-originals, sar-masks, sar-overlays, reports
+-- ====================================================================
+
+-- 1. USERS TABLE
+CREATE TABLE IF NOT EXISTS public.users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    file_name TEXT,
-    storage_path TEXT,
-    image_url TEXT,
-    source TEXT,
-    satellite TEXT,
-    sensor TEXT,
-    acquisition_time TIMESTAMPTZ,
-    latitude DOUBLE PRECISION,
-    longitude DOUBLE PRECISION,
-    metadata JSONB,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    role TEXT NOT NULL DEFAULT 'operator',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS public.detections (
+-- Seed default operator if not exists
+INSERT INTO public.users (name, email, role)
+VALUES ('Durga C', 'durga@spillwatch.maritime.gov', 'lead_operator')
+ON CONFLICT (email) DO NOTHING;
+
+-- 2. ANALYSES TABLE
+CREATE TABLE IF NOT EXISTS public.analyses (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    image_id UUID,
-    classification TEXT,
-    classification_confidence DOUBLE PRECISION,
-    oil_spill_detected BOOLEAN,
-    segmentation_completed BOOLEAN,
-    spill_area DOUBLE PRECISION,
-    spill_percentage DOUBLE PRECISION,
-    bounding_box JSONB,
-    mask_storage_path TEXT,
+    analysis_id TEXT UNIQUE NOT NULL,
+    user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    image_name TEXT NOT NULL,
+    original_image_url TEXT,
+    classification TEXT NOT NULL,
+    confidence DOUBLE PRECISION,
+    raw_probability DOUBLE PRECISION,
+    oil_pixel_count INTEGER DEFAULT 0,
+    oil_ratio DOUBLE PRECISION DEFAULT 0.0,
+    spill_area TEXT,
+    spill_area_unit TEXT DEFAULT 'km²',
+    latitude DOUBLE PRECISION,
+    longitude DOUBLE PRECISION,
+    processing_time DOUBLE PRECISION,
+    model_name TEXT DEFAULT 'Attention U-Net',
+    model_version TEXT DEFAULT 'v1.0.0',
+    inference_device TEXT DEFAULT 'CPU',
+    image_hash TEXT,
+    status TEXT NOT NULL DEFAULT 'completed',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- 3. SEGMENTATION RESULTS TABLE
+CREATE TABLE IF NOT EXISTS public.segmentation_results (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    analysis_id TEXT NOT NULL REFERENCES public.analyses(analysis_id) ON DELETE CASCADE,
     mask_url TEXT,
-    overlay_storage_path TEXT,
     overlay_url TEXT,
-    processing_status TEXT,
-    error_message TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_detections_image FOREIGN KEY (image_id) REFERENCES public.satellite_images(id) ON DELETE SET NULL
+    bounding_box JSONB,
+    oil_pixel_count INTEGER DEFAULT 0,
+    oil_ratio DOUBLE PRECISION DEFAULT 0.0,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS public.processing_jobs (
+-- 4. VESSEL RECORDS TABLE
+CREATE TABLE IF NOT EXISTS public.vessel_records (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    image_id UUID,
-    status TEXT,
-    stage TEXT,
-    progress INTEGER,
-    started_at TIMESTAMPTZ,
-    completed_at TIMESTAMPTZ,
-    error_message TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_jobs_image FOREIGN KEY (image_id) REFERENCES public.satellite_images(id) ON DELETE SET NULL
-);
-
-CREATE TABLE IF NOT EXISTS public.vessels (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    mmsi TEXT,
-    imo TEXT,
+    analysis_id TEXT NOT NULL REFERENCES public.analyses(analysis_id) ON DELETE CASCADE,
+    vessel_id TEXT NOT NULL,
     vessel_name TEXT,
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
     speed DOUBLE PRECISION,
     course DOUBLE PRECISION,
-    heading DOUBLE PRECISION,
-    timestamp TIMESTAMPTZ,
-    metadata JSONB,
+    distance_from_spill DOUBLE PRECISION,
+    correlation_score DOUBLE PRECISION,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE TABLE IF NOT EXISTS public.vessel_correlations (
+-- 5. DRIFT PREDICTIONS TABLE
+CREATE TABLE IF NOT EXISTS public.drift_predictions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    detection_id UUID,
-    vessel_id UUID,
-    distance_km DOUBLE PRECISION,
-    time_difference_hours DOUBLE PRECISION,
-    trajectory_score DOUBLE PRECISION,
-    risk_score DOUBLE PRECISION,
-    reason TEXT,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_vessel_corr_detection FOREIGN KEY (detection_id) REFERENCES public.detections(id) ON DELETE CASCADE,
-    CONSTRAINT fk_vessel_corr_vessel FOREIGN KEY (vessel_id) REFERENCES public.vessels(id) ON DELETE SET NULL
+    analysis_id TEXT NOT NULL REFERENCES public.analyses(analysis_id) ON DELETE CASCADE,
+    current_latitude DOUBLE PRECISION,
+    current_longitude DOUBLE PRECISION,
+    predicted_latitude_1h DOUBLE PRECISION,
+    predicted_longitude_1h DOUBLE PRECISION,
+    predicted_latitude_2h DOUBLE PRECISION,
+    predicted_longitude_2h DOUBLE PRECISION,
+    wind_speed DOUBLE PRECISION,
+    wind_direction DOUBLE PRECISION,
+    current_speed DOUBLE PRECISION,
+    current_direction DOUBLE PRECISION,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX IF NOT EXISTS idx_satellite_images_created_at ON public.satellite_images(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_detections_created_at ON public.detections(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_processing_jobs_image_id ON public.processing_jobs(image_id);
-CREATE INDEX IF NOT EXISTS idx_vessels_mmsi ON public.vessels(mmsi);
-CREATE INDEX IF NOT EXISTS idx_vessel_correlations_detection_id ON public.vessel_correlations(detection_id);
-
--- Storage buckets are created in Supabase via the dashboard or SQL when supported.
-CREATE TABLE IF NOT EXISTS public.storage_buckets (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+-- 6. AUDIT LOGS TABLE
+CREATE TABLE IF NOT EXISTS public.audit_logs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    analysis_id TEXT,
+    action TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'SUCCESS',
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- RLS policies are created only when the project has the necessary permissions.
--- The default public access pattern is to keep service-role access on the backend only.
-ALTER TABLE public.satellite_images ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.detections ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.processing_jobs ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.vessels ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.vessel_correlations ENABLE ROW LEVEL SECURITY;
+-- INDEXES FOR HIGH-PERFORMANCE SEARCH & KPI QUERIES
+CREATE INDEX IF NOT EXISTS idx_analyses_created_at ON public.analyses(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_analyses_classification ON public.analyses(classification);
+CREATE INDEX IF NOT EXISTS idx_analyses_analysis_id ON public.analyses(analysis_id);
+CREATE INDEX IF NOT EXISTS idx_segmentation_analysis_id ON public.segmentation_results(analysis_id);
+CREATE INDEX IF NOT EXISTS idx_vessels_analysis_id ON public.vessel_records(analysis_id);
+CREATE INDEX IF NOT EXISTS idx_drift_analysis_id ON public.drift_predictions(analysis_id);
+CREATE INDEX IF NOT EXISTS idx_audit_analysis_id ON public.audit_logs(analysis_id);
 
--- Example RLS policy structure; replace with project-specific rules as needed.
--- CREATE POLICY IF NOT EXISTS "Allow service role to read/write satellite images" ON public.satellite_images
--- FOR ALL USING (true) WITH CHECK (true);
+-- ROW LEVEL SECURITY (RLS) POLICIES
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.analyses ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.segmentation_results ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.vessel_records ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.drift_predictions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+
+-- Allow authenticated and service roles to read all analysis data
+CREATE POLICY "Allow public read access to analyses" ON public.analyses
+    FOR SELECT USING (true);
+
+CREATE POLICY "Allow service role full access to analyses" ON public.analyses
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read access to segmentation" ON public.segmentation_results
+    FOR SELECT USING (true);
+
+CREATE POLICY "Allow service role full access to segmentation" ON public.segmentation_results
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read access to vessels" ON public.vessel_records
+    FOR SELECT USING (true);
+
+CREATE POLICY "Allow service role full access to vessels" ON public.vessel_records
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow public read access to drift" ON public.drift_predictions
+    FOR SELECT USING (true);
+
+CREATE POLICY "Allow service role full access to drift" ON public.drift_predictions
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow service role full access to audit_logs" ON public.audit_logs
+    FOR ALL USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow service role full access to users" ON public.users
+    FOR ALL USING (true) WITH CHECK (true);
+
+-- STORAGE BUCKETS SETUP IN SUPABASE
+-- Run these in Supabase SQL editor or via Supabase dashboard:
+INSERT INTO storage.buckets (id, name, public)
+VALUES 
+    ('sar-originals', 'sar-originals', true),
+    ('sar-masks', 'sar-masks', true),
+    ('sar-overlays', 'sar-overlays', true),
+    ('reports', 'reports', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+-- Storage RLS: Allow public reads for display in UI
+CREATE POLICY "Allow public read access for sar-originals" ON storage.objects
+    FOR SELECT USING (bucket_id = 'sar-originals');
+
+CREATE POLICY "Allow public read access for sar-masks" ON storage.objects
+    FOR SELECT USING (bucket_id = 'sar-masks');
+
+CREATE POLICY "Allow public read access for sar-overlays" ON storage.objects
+    FOR SELECT USING (bucket_id = 'sar-overlays');
+
+CREATE POLICY "Allow public read access for reports" ON storage.objects
+    FOR SELECT USING (bucket_id = 'reports');
